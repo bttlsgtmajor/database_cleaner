@@ -2,7 +2,7 @@ require 'active_record/base'
 require 'active_record/connection_adapters/abstract_adapter'
 require 'database_cleaner/active_record/base'
 require 'database_cleaner/generic/base'
-require 'SurgicalStrike/generic/surgicalstrike'
+require 'database_cleaner/generic/surgicalstrike'
 
 module ActiveRecord
   class Base

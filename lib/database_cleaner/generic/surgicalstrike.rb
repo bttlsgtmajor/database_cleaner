@@ -1,5 +1,3 @@
-require "database_cleaner"
-
 module DatabaseCleaner
   module Generic
     module Dataholder
