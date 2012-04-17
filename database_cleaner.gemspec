@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{database_cleaner}
-  s.version = "0.7.2"
+  s.name = %q{surgical_strike}
+  s.version = "0.7.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = [%q{Ben Mabey}]
-  s.date = %q{2012-03-21}
+  s.authors = [%q{Brandon Evans}]
+  s.date = %q{2012-04-17}
   s.description = %q{Strategies for cleaning databases.  Can be used to ensure a clean state for testing.}
-  s.email = %q{ben@benmabey.com}
+  s.email = %q{brandon.evans@mrisoftware.com}
   s.extra_rdoc_files = [
     "LICENSE",
      "README.textile",
@@ -21,7 +21,6 @@ Gem::Specification.new do |s|
     "Gemfile.lock",
      "History.txt",
      "README.textile",
-     "Rakefile",
      "VERSION.yml",
      "cucumber.yml",
      "examples/Gemfile",
@@ -96,7 +95,7 @@ Gem::Specification.new do |s|
      "spec/spec.opts",
      "spec/spec_helper.rb"
   ]
-  s.homepage = %q{http://github.com/bmabey/database_cleaner}
+  s.homepage = %q{https://github.com/bttlsgtmajor/database_cleaner/tree/SS_Standalone}
   s.rdoc_options = [%q{--charset=UTF-8}]
   s.require_paths = [%q{lib}]
   s.rubygems_version = %q{1.8.5}
