@@ -14,6 +14,10 @@ Feature: database cleaning
     | ORM          |
     | ActiveRecord |
     | DataMapper   |
+    | Sequel       |
     | MongoMapper  |
     | Mongoid      |
     | CouchPotato  |
+    | Redis        |
+    | Ohm          |
+    | Neo4j        |

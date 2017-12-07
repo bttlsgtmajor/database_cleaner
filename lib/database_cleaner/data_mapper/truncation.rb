@@ -10,6 +10,12 @@ module DataMapper
         raise NotImplementedError
       end
 
+      def truncate_tables(table_names)
+        table_names.each do |table_name|
+          truncate_table table_name
+        end
+      end
+
     end
 
     class MysqlAdapter < DataObjectsAdapter
@@ -36,8 +42,7 @@ module DataMapper
 
     end
 
-
-    class Sqlite3Adapter < DataObjectsAdapter
+    module SqliteAdapterMethods
 
       # taken from http://github.com/godfat/dm-mapping/tree/master
       def storage_names(repository = :default)
@@ -53,7 +58,9 @@ module DataMapper
 
       def truncate_table(table_name)
         execute("DELETE FROM #{quote_name(table_name)};")
-        execute("DELETE FROM sqlite_sequence where name = '#{table_name}';")
+        if uses_sequence?
+          execute("DELETE FROM sqlite_sequence where name = '#{table_name}';")
+        end
       end
 
       # this is a no-op copied from activerecord
@@ -63,34 +70,20 @@ module DataMapper
         yield
       end
 
-    end
+      private
 
-    class SqliteAdapter < DataObjectsAdapter
-      # taken from http://github.com/godfat/dm-mapping/tree/master
-      def storage_names(repository = :default)
-        # activerecord-2.1.0/lib/active_record/connection_adapters/sqlite_adapter.rb: 177
+      # Returns a boolean indicating if the SQLite database is using the sqlite_sequence table.
+      def uses_sequence?
         sql = <<-SQL
-          SELECT name
-          FROM sqlite_master
-          WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+          SELECT name FROM sqlite_master
+          WHERE type='table' AND name='sqlite_sequence'
         SQL
-        # activerecord-2.1.0/lib/active_record/connection_adapters/sqlite_adapter.rb: 181
-        select(sql)
+        select(sql).first
       end
-
-      def truncate_table(table_name)
-        execute("DELETE FROM #{quote_name(table_name)};")
-        execute("DELETE FROM sqlite_sequence where name = '#{table_name}';")
-      end
-
-      # this is a no-op copied from activerecord
-      # i didn't find out if/how this is possible
-      # activerecord also doesn't do more here
-      def disable_referential_integrity
-        yield
-      end
-
     end
+
+    class SqliteAdapter; include SqliteAdapterMethods; end
+    class Sqlite3Adapter; include SqliteAdapterMethods; end
 
     # FIXME
     # i don't know if this works
@@ -110,6 +103,12 @@ module DataMapper
 
       def truncate_table(table_name)
         execute("TRUNCATE TABLE #{quote_name(table_name)} RESTART IDENTITY CASCADE;")
+      end
+
+      # override to use a single statement
+      def truncate_tables(table_names)
+        quoted_names = table_names.collect { |n| quote_name(n) }.join(', ')
+        execute("TRUNCATE TABLE #{quoted_names} RESTART IDENTITY;")
       end
 
       # FIXME
@@ -153,9 +152,7 @@ module DatabaseCleaner
       def clean(repository = self.db)
         adapter = ::DataMapper.repository(repository).adapter
         adapter.disable_referential_integrity do
-          tables_to_truncate(repository).each do |table_name|
-            adapter.truncate_table table_name
-          end
+          adapter.truncate_tables(tables_to_truncate(repository))
         end
       end
 
@@ -166,8 +163,8 @@ module DatabaseCleaner
       end
 
       # overwritten
-      def migration_storage_name
-        'migration_info'
+      def migration_storage_names
+        %w[migration_info]
       end
 
     end
